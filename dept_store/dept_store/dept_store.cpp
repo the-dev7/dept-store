@@ -1,20 +1,22 @@
-// dept_store.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+/*
+Features of our project:
 
-#include <iostream>
+	Dealer(or Admin)
+						***Password  protected***
+		newProd() -> To add new products with product name, price and quantity.
+		dispStock() -> To display the current stock.
+		refill() -> Refill or restock current products.
+		removeItem() -> To remove a certain product by entering the product name.
+		empName() -> Has the name, employee ID number, salary and attandance of all the employees.
+		removeEmp() -> To remove an employee by typing the employee ID number.
 
-int main()
-{
-    std::cout << "Hello World!\n";
-}
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+	Employee 
+		newProd() -> To add new products with product name, price and quantity.
+		dispStock() -> To display the current stock.
+		refill() -> Refill or restock current products.
+		removeItem() -> To remove a certain product by entering the product name.
+	Customer
+		buyProd() -> Displays all the products, its quantity available and its price and 
+					 asks the user to enter the name and quantity of the product to be purchased.
+		getBill() -> Generates the bill for the products bought by the customer.
+*/
