@@ -23,6 +23,7 @@ Features of our project:
 		getBill() -> Generates the bill for the products bought by the customer.
 */
 #include<iostream>
+#include<iomanip>
 #include<string.h>
 #include<conio.h>
 #include<math.h>
@@ -40,136 +41,140 @@ void dispStock();
 //**************************************************************Product Class**************************************************************
 class Products
 {
-public:
-	char prodName[30];
-	int prodNumber;
-	float Price;
-	int Quantity;
-	void refill(int qty)
-	{
-
-		Quantity += qty;
-		cout << "\n\nStock updated.";
-		//getch();  Error: Return value ignored getch()
-
-	}
-	void show()
-	{
-
-		cout << "\n" << prodName << "\t\t" << prodNumber << "\t\t" << Price << "\t\t" << Quantity;
-	}
-	void get()
-	{
-		cin >> prodName >> prodNumber >> Price >> Quantity;
-
-	}
-	int prodCheck(char nm[30])
-	{
-		if (strcmp(nm, prodName) == 0)
-			return 0;
-		else
-			return 1;
-	}
-	void removeItem(int qty)
-	{
-		if (Quantity >= qty)
-		{
-			Quantity -= qty;
-			cout << "\n\nStock updated.\n";
+	public:
+		char prodName[30];
+		int prodNumber;
+		float Price;
+		int Quantity;
+		void refill(int qty)
+		{	
+			Quantity += qty;
+			cout << "\n\nStock updated.";
+			//getch();  Error: Return value ignored getch()
 		}
+		void show()
+		{
+			cout << "\n" << prodName << "\t\t" << prodNumber << "\t\t" << Price << "\t\t" << Quantity;
+		}
+		void get()
+		{
+			cout<<"Enter product name: ";
+			cin>>prodName;
+			cout<<"Enter product ID: ";
+			cin>>prodNumber;
+			cout<<"Enter MRP: ";
+			cin>>Price;
+			cout<<"Enter quantity";
+			cin>>Quantity;
+		}
+		int prodCheck(char nm[30])
+		{
+			if (strcmp(nm, prodName) == 0)
+				return 0;
+			else
+				return 1;
+		}
+		void removeItem(int qty)
+		{
+			if (Quantity >= qty)
+			{
+				Quantity -= qty;
+				cout << "\n\nStock updated.\n";
+			}
 		else
 			cout << "\n\nInsufficient stock";
-		//getch();  Error: Return value ignored getch()
-	}
+			//getch();  Error: Return value ignored getch()
+		}
 }st;  //________object created along with the class________
 
 //**************************************************************Employee Class**************************************************************
 class Employee : protected Products
 {
-	string ename[50];
-	int eid[50];
-	float salary[50];
-	int attandance[50];
+	protected:	
+		string ename;
+		int eid;		//limit eid to 4 digits
+		double salary;
+		int attandance;
 
-protected:
-
-	void newProd()
-	{
-		system("cls");
-
-		dispStock();
-		//getch();  Error: Return value ignored getch()
-		system("cls");
-
-		cout << "\nEnter the No. of Products that you wish to add: ";
-		cin >> num;
-
-		if (num != 0)
+	public:
+		void newProd()
 		{
+			//system("cls");	
+			//dispStock();
+			int num;
+			system("cls");
+			cout<<"\nEnter the No. of Products that you wish to add: ";
+			cin>>num;
+			
+			Products p[num];
 
-			fout.open("shop.dat", ios::binary | ios::app);
-			for (i = 0; i < num; i++)
-
+			if (num != 0)
 			{
-
-				cout << "\n\nInput the name, price and the quantity of item respectively\n\n";
-				st.get();
-				fout.write((char*)&st, sizeof(st));
-				cout << "\n\nitem updated";
+				fout.open("shop.dat", ios::binary | ios::app);
+				for (i = 0; i < num; i++)
+				{	
+					cout << "\n\nInput the name, price and the quantity of item respectively\n\n";
+					p[i].get();
+					fout.write((char*)&p[i], sizeof(p[i]));
+					cout<<"\n\nitem updated";
+					cin.get();
+				}
+				cout << "\n\nStock Updated!!";
+				fout.close();
 				cin.get();
-
-
+				system("cls");
+				dispStock();
 			}
-			cout << "\n\nStock Updated!!";
-
-			fout.close();
-			cin.get();
-			system("cls");
-			dispStock();
-		}
-
-		else
-		{
-
-			fout.close();
-			cin.get();
-			system("cls");
-			cout << "\n\nNo items to be added";
-
-		}
-	}
-	void refill()
-	{
-		system("cls");
-		char temp[100]; int qty;
-		int i = 0;
-		long pos = 0;
-		dispStock();
-		cout << "\n\nEnter the products name \n" << endl;
-		cin >> temp;
-		cout << "\n\nEnter quantity: \n" << endl;
-		cin >> qty;
-		fileOne.open("shop.dat", ios::binary | ios::out | ios::in);
-		while (fileOne)
-		{
-			pos = fileOne.tellp();
-			fileOne.read((char*)&st, sizeof(st));
-			if (st.prodCheck(temp) == 0)
+			else
 			{
-
-				st.refill(qty);
-				fileOne.seekp(pos);
-				fileOne.write((char*)&st, sizeof(st));
-				i++; break;
-			}
+				fout.close();
+				cin.get();
+				system("cls");
+				cout << "\n\nNo items to be added";
+			}	
 		}
-		if (i != 1)
-			cout << "\n\n!!Record not found!!";
-		fileOne.close();
-		system("cls");
-		cin.get();
-		dispStock(); cin.get();
-	}
+		void refill()
+		{
+			system("cls");
+			char temp[100]; int qty;
+			int i = 0;
+			long pos = 0;
+			dispStock();
+			cout<<"Enter the products name: "<<endl;
+			cin>>temp;
+			
+			// adding negative int check
+			neg_qty:
+			
+			cout<<"Enter quantity: "<<endl;
+			cin>>qty;
+			
+			if (qty < 0)
+			{
+				goto neg_qty;
+			}
+			
+			fileOne.open("shop.dat", ios::binary | ios::out | ios::in);
+			while (fileOne)
+			{
+				pos = fileOne.tellp();
+				fileOne.read((char*)&st, sizeof(st));
+				if (st.prodCheck(temp) == 0)
+				{
+					st.refill(qty);
+					fileOne.seekp(pos);
+					fileOne.write((char*)&st, sizeof(st));
+					i++; break;
+				}	
+			}
+			if (i != 1)
+				cout << "\n\n!!Record not found!!";
+				fileOne.close();
+				system("cls");
+				cin.get();
+				dispStock();
+				cin.get();
+		}
 };
 
 //****************************************************Individual Functions***************************************************
@@ -202,6 +207,38 @@ void dispStock()
 	fin.close();
 }
 
+class Dealer : public Employee
+{
+	public:
+		void addEmp()
+		{
+			fflush(stdin);
+			cout<<"Enter name of employee: ";
+			getline(cin, ename);
+			cout<<"Enter Employee ID: ";
+			cin>>eid;
+			cout<<"Enter base salary: ";
+			cin>>salary;
+		}	
+		
+		void viewEmp()
+		{
+			/*	// shows individual records
+			USE THIS IN main() WHILE DISPLAYING EMP DETAILS
+			cout<<"EMP_NAME"<<setw(21)<<"EID"<<setw(20)<<"SALARY"<<endl;
+			*/
+			cout<<ename<<setw(29 - ename.length())<<eid<<setw(20)<<salary<<endl;	
+		}
+		void viewAttendance()
+		{
+			/*	// shows individual records
+			USE THIS IN main() WHILE DISPLAYING EMP DETIALS
+			cout<<"EMP_NAME"<<setw(21)<<"EID"<<setw(20)<<"ATTENDANCE"<<endl;
+			*/
+			cout<<ename<<setw(29 - ename.length())<<eid<<setw(20)<<attendance<<endl;
+		}
+};
+
 // ***************************************************main function***************************************************
 int main()
 {
@@ -219,6 +256,7 @@ int main()
 		fileOne.open(filename, fstream::in | fstream::out | fstream::trunc);
 		fileOne << "\n";
 		fileOne.close();
+		
 
 	}
 	else
@@ -226,7 +264,13 @@ int main()
 		cout << "Success! " << filename << " found. \n";
 		fileOne.close();
 		cout << "\n";
-
 	}
+	
+	Dealer d;
+	d.addEmp();
+	//d.newProd();
+	//d.refill();
+	//dispStock();
+	
 	return 0;
 }
