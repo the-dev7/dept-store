@@ -207,6 +207,39 @@ void dispStock()
 	fin.close();
 }
 
+// file check [for any db file exist check]
+bool ifFileExists(string file)
+{
+	ifstream f(file);
+	return f.good();
+}
+
+// for hiding password
+/*
+	IMPLEMENT LIKE THIS:
+	main()
+	{
+		int limit = 10;			// say.. we can add custom limit [another method]
+		string pass = PasswordHide(limit);			//function call
+		cout<<"Your entered password: "<<pass<<endl;	// showing the returned string..
+	}
+*/
+string PasswordHide (int limit)
+{
+	char pass[limit];
+	int i;
+	while(i < limit)
+	{
+		pass[i] = getch();
+		putch('*');
+		i++;
+	}
+	cout<<endl;
+	return pass;
+}
+
+//******************************************************* Dealer Class ********************************************************
+
 class Dealer : public Employee
 {
 	public:
