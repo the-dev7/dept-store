@@ -26,6 +26,7 @@ Features of our project:
 #include<iomanip>
 #include<string.h>
 #include<conio.h>
+#include<string.h>
 #include<math.h>
 #include<fstream>
 
@@ -54,7 +55,7 @@ class Products
 		}
 		void show()
 		{
-			cout << "\n" << prodName << "\t\t" << prodNumber << "\t\t" << Price << "\t\t" << Quantity;
+			cout<<"\n"<<prodName<<setw(36 - strlen(prodName))<<prodNumber<<setw(17)<<Price<<setw(20)<<Quantity;
 		}
 		void get()
 		{
@@ -64,7 +65,7 @@ class Products
 			cin>>prodNumber;
 			cout<<"Enter MRP: ";
 			cin>>Price;
-			cout<<"Enter quantity";
+			cout<<"Enter quantity: ";
 			cin>>Quantity;
 		}
 		int prodCheck(char nm[30])
@@ -94,7 +95,7 @@ class Employee : protected Products
 		string ename;
 		int eid;		//limit eid to 4 digits
 		double salary;
-		int attandance;
+		int attendance;
 
 	public:
 		void newProd()
@@ -111,7 +112,7 @@ class Employee : protected Products
 			if (num != 0)
 			{
 				fout.open("shop.dat", ios::binary | ios::app);
-				for (i = 0; i < num; i++)
+				for (int i = 0; i < num; i++)
 				{	
 					cout << "\n\nInput the name, price and the quantity of item respectively\n\n";
 					p[i].get();
@@ -135,23 +136,24 @@ class Employee : protected Products
 		}
 		void refill()
 		{
+			refill_totop:
 			system("cls");
-			char temp[100]; int qty;
-			int i = 0;
+			char temp[30]; int qty;
+			int j = 0;
 			long pos = 0;
 			dispStock();
-			cout<<"Enter the products name: "<<endl;
+			cout<<"\nEnter the products name: ";
 			cin>>temp;
 			
-			// adding negative int check
-			neg_qty:
-			
-			cout<<"Enter quantity: "<<endl;
+			cout<<"Enter quantity: ";
 			cin>>qty;
 			
+			// adding negative int check
 			if (qty < 0)
 			{
-				goto neg_qty;
+				cout<<"\nQuantity cannot be negative.\nPress any key to re-enter"<<endl;
+				getch();
+				goto refill_totop;
 			}
 			
 			fileOne.open("shop.dat", ios::binary | ios::out | ios::in);
@@ -164,28 +166,48 @@ class Employee : protected Products
 					st.refill(qty);
 					fileOne.seekp(pos);
 					fileOne.write((char*)&st, sizeof(st));
-					i++; break;
-				}	
+					j++; 
+					break;
+				}
 			}
-			if (i != 1)
-				cout << "\n\n!!Record not found!!";
+			
+			if (j == 0)
+			{
+				cout<<"\n\n!!Record not found!!";
+				getch();
 				fileOne.close();
-				system("cls");
-				cin.get();
-				dispStock();
-				cin.get();
-		}
+				goto refill_totop;
+			}
+			fileOne.close();
+			system("cls");
+			cin.get();
+			dispStock();
+			cin.get();
+		} 
 };
 
 //****************************************************Individual Functions***************************************************
 void dispStock()
 {
 	int i = 1;
+	/*
 	cout << "\n==================================================================";
 	cout << "\n\n=================\tTHE STOCK ITEMS ARE\t==================";
 	cout << "\n\n==================================================================\n";
 	cout << "\nName\t Product No.\tPrice\t Quantity";
 	cout << "\n\n============================================================\n";
+	*/
+	
+	for (int i=0;i<74;i++) cout<<"=";
+	cout<<endl<<endl;
+	cout<<setw(49)<<"THE STOCK ITEMS ARE"<<endl<<endl;
+	for (int i=0;i<74;i++) cout<<"=";
+	cout<<endl<<endl;
+	cout<<"Name"<<setw(32)<<"Product_ID"<<setw(17)<<"Price"<<setw(20)<<"Quantity";
+	cout<<endl<<endl;
+	for (int i=0;i<74;i++) cout<<"=";
+	cout<<endl;
+	
 	fin.open("shop.dat", ios::binary);
 	while (!fin.eof())
 	{
@@ -272,10 +294,20 @@ class Dealer : public Employee
 		}
 };
 
+// *********************************************** Customer Class *************************************************************
+
+class Customer : protected Products					// in progress
+{
+	void buyProd()
+	{
+		dispStock();
+	}
+};
+
 // ***************************************************main function***************************************************
 int main()
 {
-
+	/*
 	char filename[] = "store.txt";
 	fstream fileOne;
 
@@ -297,10 +329,10 @@ int main()
 		cout << "Success! " << filename << " found. \n";
 		fileOne.close();
 		cout << "\n";
-	}
+	}*/
 	
 	Dealer d;
-	d.addEmp();
+	//d.addEmp();
 	//d.newProd();
 	//d.refill();
 	//dispStock();
