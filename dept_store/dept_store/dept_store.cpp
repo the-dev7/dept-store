@@ -75,6 +75,7 @@ class Products
 			else
 				return 1;
 		}
+		/*
 		void removeItem(int qty)
 		{
 			if (Quantity >= qty)
@@ -86,6 +87,20 @@ class Products
 			cout << "\n\nInsufficient stock";
 			//getch();  Error: Return value ignored getch()
 		}
+		*/
+		// buyProd() supplement function
+		int sellProd(int qty)
+		{
+			int ret_val = 0;
+			if (Quantity >= qty)
+				Quantity -= qty;
+			else
+				ret_val = 1;
+			
+			return ret_val;
+		}
+		
+		
 }st;  //________object created along with the class________
 
 //**************************************************************Employee Class**************************************************************
@@ -226,6 +241,11 @@ void dispStock()
 		cout << "\n\n\t\t\t!!Empty record room!!";
 		//getch();  Error: Return value ignored getch()
 	}
+	
+	cout<<endl<<endl;
+	for (int i=0;i<74;i++) cout<<"=";
+	cout<<endl;
+	
 	fin.close();
 }
 
@@ -298,9 +318,73 @@ class Dealer : public Employee
 
 class Customer : protected Products					// in progress
 {
+	public:
+		
 	void buyProd()
 	{
+		buypr_top:
+		system("cls");
 		dispStock();
+		
+		char temp[30];
+		int qty, tag = 0;
+		long pos = 0;
+		
+		cout<<endl<<endl<<"Enter following details to purchase:"<<endl;
+		cout<<"Enter product name: ";
+		cin>>temp;
+		
+		fileOne.open("shop.dat", ios::binary | ios::out | ios::in);
+		while (fileOne)
+		{
+			pos = fileOne.tellp();
+			fileOne.read((char*)&st, sizeof(st));
+			if (st.prodCheck(temp) == 0)
+			{
+				
+				cout<<"Enter quantity: ";
+				cin>>qty;
+				
+				int a = st.sellProd(qty);
+				if (a == 0)
+				{
+					fileOne.seekp(pos);
+					fileOne.write((char*)&st, sizeof(st));
+					cout<<endl<<"\nItem added to cart.."<<endl;
+					tag++;
+					break;
+				}
+				else
+				{	
+					tag = 2;
+					break;
+				}
+			}
+		}
+		
+		if (tag == 0)
+		{
+			cout<<"\nProduct not found. Please re-enter the details"<<endl;
+			getch();
+			fileOne.close();
+			goto buypr_top;	
+		}
+		
+		if (tag == 2)
+		{
+			cout<<"\nInsufficient Stock. Please re-enter valid details."<<endl;
+			getch();
+			fileOne.close();
+			goto buypr_top;
+		}
+		
+		else
+		{
+			cout<<"Press any key to continue"<<endl;
+			getch();
+			fileOne.close();
+		}
+		
 	}
 };
 
@@ -336,6 +420,8 @@ int main()
 	//d.newProd();
 	//d.refill();
 	//dispStock();
+	//Customer c;
+	//c.buyProd();
 	
 	return 0;
 }
