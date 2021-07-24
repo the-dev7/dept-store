@@ -1,6 +1,5 @@
 /*
 Features of our project:
-
 	Dealer(or Admin)
 						***Password  protected***
 		newProd() -> To add new products with product name, price and quantity.
@@ -11,7 +10,6 @@ Features of our project:
 		viewAttendance() -> Shows the Employee name, Employee ID and Employee Attandance of all Employees.
 		dailyAttandance() -> Marks the attandance of all the employees daily.
 		removeEmp() -> To remove an employee by typing the employee ID number.
-
 	Employee 
 		newProd() -> To add new products with product name, price and quantity.
 		dispStock() -> To display the current stock.
@@ -28,6 +26,7 @@ Features of our project:
 #include<conio.h>
 #include<string.h>
 #include<math.h>
+#include<vector>
 #include<fstream>
 
 using namespace std;
@@ -98,6 +97,11 @@ class Products
 				ret_val = 1;
 			
 			return ret_val;
+		}
+		
+		void custQty(int qty)
+		{
+			Quantity = qty;
 		}
 		
 		
@@ -318,8 +322,9 @@ class Dealer : public Employee
 
 class Customer : protected Products					// in progress
 {
+	vector<Products> list;
+	
 	public:
-		
 	void buyProd()
 	{
 		buypr_top:
@@ -350,6 +355,10 @@ class Customer : protected Products					// in progress
 				{
 					fileOne.seekp(pos);
 					fileOne.write((char*)&st, sizeof(st));
+					
+					st.custQty(qty);
+					list.push_back(st);
+					
 					cout<<endl<<"\nItem added to cart.."<<endl;
 					tag++;
 					break;
@@ -386,6 +395,14 @@ class Customer : protected Products					// in progress
 		}
 		
 	}
+	
+	void genBill()
+	{
+		for (auto i=list.begin(); i<list.end(); i++)
+		{
+			(*i).show();
+		}
+	}
 };
 
 // ***************************************************main function***************************************************
@@ -394,19 +411,15 @@ int main()
 	/*
 	char filename[] = "store.txt";
 	fstream fileOne;
-
 	fileOne.open(filename, std::fstream::in | std::fstream::out | std::fstream::app);
-
 	// If file does not exist, Creating new file
 	if (!fileOne)
 	{
 		cout << "Cannot open file as file does not exist. \nCreating new file...";
-
 		fileOne.open(filename, fstream::in | fstream::out | fstream::trunc);
 		fileOne << "\n";
 		fileOne.close();
 		
-
 	}
 	else
 	{    // use existing file
@@ -419,8 +432,20 @@ int main()
 	//d.addEmp();
 	//d.newProd();
 	//d.refill();
-	//dispStock();
-	//Customer c;
+	dispStock();
+	Customer c;
+	
+	char choice;
+	
+	while (tolower(choice) != 'n')
+	{
+		c.buyProd();
+		cout<<"\nDo you want to continue shopping? (Y/N): ";
+		cin>>choice;
+	}
+	
+	c.genBill();
+	
 	//c.buyProd();
 	
 	return 0;
