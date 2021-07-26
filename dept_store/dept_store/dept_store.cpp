@@ -29,6 +29,7 @@ Features of our project:
 #include<vector>
 #include<fstream>
 #include<ctime>
+#include<stdio.h>
 
 using namespace std;
 
@@ -214,19 +215,33 @@ class Employee : protected Products
 			dispStock();
 			cin.get();
 		} 
-};
+		
+		void addEmp()
+		{
+			fflush(stdin);
+			cout<<"Enter name of employee: ";
+			getline(cin, ename);
+			cout<<"Enter Employee ID: ";
+			cin>>eid;
+			cout<<"Enter base salary: ";
+			cin>>salary;	
+		}	
+		
+		void viewEmp()
+		{
+			/*	// shows individual records
+			USE THIS IN main() WHILE DISPLAYING EMP DETAILS
+			cout<<"EMP_NAME"<<setw(21)<<"EID"<<setw(20)<<"SALARY"<<endl;
+			*/
+			cout<<ename<<setw(29 - ename.length())<<eid<<setw(21)<<salary<<endl;	
+		}
+		
+}emp;
 
 //****************************************************Individual Functions***************************************************
 void dispStock()
 {
 	int i = 1;
-	/*
-	cout << "\n==================================================================";
-	cout << "\n\n=================\tTHE STOCK ITEMS ARE\t==================";
-	cout << "\n\n==================================================================\n";
-	cout << "\nName\t Product No.\tPrice\t Quantity";
-	cout << "\n\n============================================================\n";
-	*/
 	
 	for (int i=0;i<74;i++) cout<<"=";
 	cout<<endl<<endl;
@@ -253,8 +268,8 @@ void dispStock()
 	}
 	if (i == 0)
 	{
-		cout << "\n\n\t\t\t!!Empty record room!!";
-		//getch();  Error: Return value ignored getch()
+		//cout << "\n\n\t\t\t!!Empty record room!!";
+		cout<<setw(37 + 11)<<"!! Empty record room !!";
 	}
 	
 	cout<<endl<<endl;
@@ -264,34 +279,31 @@ void dispStock()
 	fin.close();
 }
 
-// file check [for any db file exist check]
-bool ifFileExists(string file)
+string PasswordHide()
 {
-	ifstream f(file);
-	return f.good();
-}
-
-// for hiding password
-/*
-	IMPLEMENT LIKE THIS:
-	main()
+	char pass[30];
+	int i = 0;
+	char a;
+	while (1)
 	{
-		int limit = 10;			// say.. we can add custom limit [another method]
-		string pass = PasswordHide(limit);			//function call
-		cout<<"Your entered password: "<<pass<<endl;	// showing the returned string..
+		a = getch();
+		if ((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z') || (a >= '0' && a <= '9'))
+		{
+			pass[i] = a;
+			i++;
+			cout<<"*";
+		}
+		if (a == '\b' && i>0)
+		{
+			cout<<"\b \b";
+			i--;
+		}
+		if (a == '\r')
+		{
+			pass[i] = '\0';
+			break;
+		}
 	}
-*/
-string PasswordHide (int limit)
-{
-	char pass[limit];
-	int i;
-	while(i < limit)
-	{
-		pass[i] = getch();
-		putch('*');
-		i++;
-	}
-	cout<<endl;
 	return pass;
 }
 
@@ -317,41 +329,139 @@ string getDate()
     string day = ((local_time->tm_mday) / 10 == 0) ? "0" + to_string(local_time->tm_mday) : to_string(local_time->tm_mday);
     
     return (day + "/" + mnth + "/" + year);
-    
 }
 
 //******************************************************* Dealer Class ********************************************************
 
+fstream empRec;
+
+// function to create designer lines
+// function created to fix issue while using setw() in viewAllEmp() function.
+void prettyPrintEmp()
+{
+	for(int i=0;i<50;i++) cout<<"=";
+	cout<<endl;
+}
+
 class Dealer : public Employee
 {
+	//string storeName;
+	string accessPwd;
+	char store[30];
 	public:
-		void addEmp()
-		{
-			fflush(stdin);
-			cout<<"Enter name of employee: ";
-			getline(cin, ename);
-			cout<<"Enter Employee ID: ";
-			cin>>eid;
-			cout<<"Enter base salary: ";
-			cin>>salary;
-		}	
 		
-		void viewEmp()
+		void initRun()
 		{
-			/*	// shows individual records
-			USE THIS IN main() WHILE DISPLAYING EMP DETAILS
-			cout<<"EMP_NAME"<<setw(21)<<"EID"<<setw(20)<<"SALARY"<<endl;
-			*/
-			cout<<ename<<setw(29 - ename.length())<<eid<<setw(20)<<salary<<endl;	
+			//this->storeName = "Departmental_Store";
+			this->accessPwd = "admin";
+			strcpy(store, "Departmental_Store");
+			
+			fstream fil;
+			fil.open("Dealer.dat", ios::binary | ios::out);
+			fil.write((char*)this, sizeof(*(this)));
+			fil.close();
 		}
-		void viewAttendance()
+		/*
+		char* getStoreName()
 		{
-			/*	// shows individual records
-			USE THIS IN main() WHILE DISPLAYING EMP DETIALS
-			cout<<"EMP_NAME"<<setw(21)<<"EID"<<setw(20)<<"ATTENDANCE"<<endl;
-			*/
-			cout<<ename<<setw(29 - ename.length())<<eid<<setw(20)<<attendance<<endl;
+			fstream f9;
+			f9.open("Dealer.dat", ios::binary | ios::in);
+			f9.read((char*)this, sizeof(*(this)));
+			f9.close();
+			
+			return (this->store);
+		}*/
+		
+		string getPwd()
+		{
+			return accessPwd;
 		}
+		
+		int enterPassword()
+		{
+			string l;
+			
+			cout<<"NOTE: Max Password length is 30"<<endl;
+			cout<<"Password can contain only the following:\na - z, A - Z, 0 - 9"<<endl<<endl;
+			cout<<"Enter password: ";
+			l = PasswordHide();
+			
+			fstream f;
+			f.open("Dealer.dat", ios::binary | ios::in);
+			f.read((char*)this, sizeof(*(this)));
+			f.close();
+			
+			if (l == this->accessPwd)
+				return 1;
+			else
+				return 0;
+		}
+		
+		void modifyPassword()
+		{
+			string h;
+			cout<<"Enter new password: ";
+			h = PasswordHide();
+			
+			fstream f;
+			f.open("Dealer.dat", ios::binary | ios::in);
+			f.read((char*)this, sizeof(*(this)));
+			f.close();
+			
+			this->accessPwd = h;
+			
+			fstream f1;
+			f1.open("Dealer.dat", ios::binary | ios::out);
+			f1.write((char*)this, sizeof(*(this)));
+			f1.close();
+			
+		}
+		
+		void addNewEmp()
+		{
+			emp.addEmp();				
+			empRec.open("empData.dat", ios::binary | ios::app);
+			empRec.write((char*)&emp, sizeof(emp));
+			empRec.close();		
+		}
+		
+		void viewAllEmp()
+		{
+			prettyPrintEmp();	
+			cout<<"EMP_NAME"<<setw(21)<<"EID"<<setw(21)<<"SALARY"<<endl;
+			prettyPrintEmp();	
+			int isData = 0;
+			empRec.open("empData.dat", ios::binary | ios::in);
+			while(!empRec.eof())
+			{
+				empRec.read((char*)&emp, sizeof(emp));
+				if (!empRec.eof())
+				{
+					if (empRec.tellg() < 0)
+					{
+						isData = 0; break;
+					}
+					emp.viewEmp();
+					isData = 1;
+				}	
+			}
+			
+			empRec.close();
+			
+			if (isData == 0)
+			{
+				//cout << "\n\n\t\t!!Empty record room!!";
+				cout<<"\t     !! Empty record room !!";
+				//getch();  Error: Return value ignored getch()
+			}
+			
+			prettyPrintEmp();
+		}
+		/*
+		void dlrshow()
+		{
+			cout<<store<<" -- "<<accessPwd<<endl;
+		}*/
 };
 
 // *********************************************** Customer Class *************************************************************
@@ -439,8 +549,8 @@ class Customer : protected Products					// in progress
 		// string name = getStoreName()
 		// code capable of resizing text to align by itself.
 		string name = "Departmental Store";
-		
 		system("cls");
+		
 		string date = getDate();
 		string time = getTime();
 		
@@ -448,6 +558,7 @@ class Customer : protected Products					// in progress
 		cout<<endl<<endl;
 		
 		cout<<setw(37 + (name.length())/2)<<name<<endl<<endl;
+		//cout<<setw(37 + (len)/2)<<name<<endl<<endl;
 		
 		for (int i=0;i<74;i++) cout<<"=";
 		cout<<endl;
@@ -489,31 +600,205 @@ class Customer : protected Products					// in progress
 // ***************************************************main function***************************************************
 int main()
 {
-	/*
-	char filename[] = "store.txt";
-	fstream fileOne;
-	fileOne.open(filename, std::fstream::in | std::fstream::out | std::fstream::app);
-	// If file does not exist, Creating new file
-	if (!fileOne)
-	{
-		cout << "Cannot open file as file does not exist. \nCreating new file...";
-		fileOne.open(filename, fstream::in | fstream::out | fstream::trunc);
-		fileOne << "\n";
-		fileOne.close();
-		
-	}
-	else
-	{    // use existing file
-		cout << "Success! " << filename << " found. \n";
-		fileOne.close();
-		cout << "\n";
-	}*/
+
+	Dealer b;
 	
-	Dealer d;
-	//d.addEmp();
+	int c0;
+	do
+	{
+		system("cls");
+		
+		for(int i=0;i<70;i++) cout<<"=";
+		cout<<endl;
+		cout<<setw(70 - 17)<<"Departmental Store Management System"<<endl;
+		for(int i=0;i<70;i++) cout<<"=";
+		cout<<endl;
+		cout<<setw(40)<<"Main Menu"<<endl;
+		for(int i=0;i<70;i++) cout<<"=";
+		cout<<endl<<endl;
+		
+		cout<<setw(10)<<"	Select an option:\n\n	1.Admin/Dealer login\n	2.Employee\n	3.Customer\n	4.Exit"<<endl<<endl;
+		cout<<"	Enter your choice: ";
+		cin>>c0;
+		
+		if (c0 == 1)
+		{
+		 	a:
+			// password check
+			system("cls");
+			int chk = b.enterPassword();
+			if (chk == 0)
+			{
+				goto a;	
+			}
+			int c1;
+			do
+			{
+				system("cls");
+				
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl;
+				cout<<setw(70 - 17)<<"Departmental Store Management System"<<endl;
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl;
+				cout<<setw(41)<<"Admin Menu"<<endl;
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl<<endl;
+				
+				cout<<"	Select an option:\n\n	1. Change login password\n	2. Add New Product\n	3. Refill Stock\n	4. Check Stock\n	5. Add New Employee\n	6. View All Employee\n	7. Exit to main menu"<<endl<<endl;
+				cout<<"	Enter your choice: ";
+				cin>>c1;
+				
+				if (c1 == 1)
+				{
+					system("cls");
+					b.modifyPassword();
+					getch();
+				}
+				if (c1 == 2)
+				{
+					b.newProd();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				if (c1 == 3)
+				{
+					b.refill();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				if (c1 == 4)
+				{
+					system("cls");
+					dispStock();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				
+				if (c1 == 5)
+				{
+					system("cls");
+					b.addNewEmp();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				
+				if (c1 == 6)
+				{
+					system("cls");
+					b.viewAllEmp();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				
+			}while(c1 != 7);
+		}
+		
+		if (c0 == 2)
+		{
+			int c2;
+			Employee e;
+			do{
+				system("cls");
+		
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl;
+				cout<<setw(70 - 17)<<"Departmental Store Management System"<<endl;
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl;
+				cout<<setw(41)<<"Employee Menu"<<endl;
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl<<endl;
+				
+				cout<<"	Select an option:\n\n	1. Add New Product\n	2. Refill Stock\n	3. Check Stock\n	4. Exit to main menu"<<endl<<endl;
+				cout<<"	Enter your choice: ";
+				cin>>c2;
+				
+				if (c2 == 1)
+				{
+					e.newProd();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				if (c2 == 2)
+				{
+					e.refill();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				if (c2 == 3)
+				{
+					system("cls");
+					dispStock();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+			}while(c2 != 4);
+		}
+		
+		if (c0 == 3)
+		{
+			int c3;
+			Customer c;
+			do
+			{
+				system("cls");
+				
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl;
+				cout<<setw(70 - 17)<<"Departmental Store Management System"<<endl;
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl;
+				cout<<setw(41)<<"Customer Menu"<<endl;
+				for(int i=0;i<70;i++) cout<<"=";
+				cout<<endl<<endl;
+				
+				cout<<"	Select an option\n\n	1. View Product list\n	2. Purchase\n	3. Exit to main menu"<<endl<<endl;
+				cout<<"	Enter your choice: ";
+				cin>>c3;
+				
+				if (c3 == 1)
+				{
+					system("cls");
+					dispStock();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				
+				if (c3 == 2)
+				{
+					char choice;
+	
+					while (tolower(choice) != 'n')
+					{
+						c.buyProd();
+						cout<<"\nDo you want to continue shopping? (Y/N): ";
+						cin>>choice;
+					}
+					c.genBill();
+					cout<<"\n\nPress any key to continue"<<endl;
+					getch();
+				}
+				
+			}while(c3 != 3);
+		}
+		
+	}while(c0 != 4);
+
+	/*d.initRun();
+	
+	adm.open("admin.dat", ios::binary | ios::out);
+	adm.write((char*)&d, sizeof(d));
+	adm.close();*/
+	
+	//d.enterPassword();
+	//d.addNewEmp();
+	
+	//d.viewAllEmp();
 	//d.newProd();
 	//d.refill();
 	//dispStock();
+	/*
 	Customer c;
 	
 	char choice;
@@ -526,6 +811,9 @@ int main()
 	}
 	
 	c.genBill();
+	*/
+	
+	
 	
 	return 0;
 }
