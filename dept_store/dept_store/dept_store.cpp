@@ -331,6 +331,24 @@ string getDate()
     return (day + "/" + mnth + "/" + year);
 }
 
+// checks if program has been executed before
+int checkIfInit()
+{
+	int n;
+	ifstream r("init.txt");
+	if (r.is_open())
+	{
+		r >> n;
+		n++;
+	}
+	r.close();
+	
+	ofstream o("init.txt");
+	o << n;
+	o.close();
+	return n;	
+}
+
 //******************************************************* Dealer Class ********************************************************
 
 fstream empRec;
@@ -347,34 +365,17 @@ class Dealer : public Employee
 {
 	//string storeName;
 	string accessPwd;
-	char store[30];
 	public:
 		
 		void initRun()
 		{
 			//this->storeName = "Departmental_Store";
 			this->accessPwd = "admin";
-			strcpy(store, "Departmental_Store");
 			
 			fstream fil;
 			fil.open("Dealer.dat", ios::binary | ios::out);
 			fil.write((char*)this, sizeof(*(this)));
 			fil.close();
-		}
-		/*
-		char* getStoreName()
-		{
-			fstream f9;
-			f9.open("Dealer.dat", ios::binary | ios::in);
-			f9.read((char*)this, sizeof(*(this)));
-			f9.close();
-			
-			return (this->store);
-		}*/
-		
-		string getPwd()
-		{
-			return accessPwd;
 		}
 		
 		int enterPassword()
@@ -451,17 +452,11 @@ class Dealer : public Employee
 			if (isData == 0)
 			{
 				//cout << "\n\n\t\t!!Empty record room!!";
-				cout<<"\t     !! Empty record room !!";
-				//getch();  Error: Return value ignored getch()
+				cout<<"\t     !! Empty record room !!"<<endl;
 			}
 			
 			prettyPrintEmp();
 		}
-		/*
-		void dlrshow()
-		{
-			cout<<store<<" -- "<<accessPwd<<endl;
-		}*/
 };
 
 // *********************************************** Customer Class *************************************************************
@@ -602,6 +597,11 @@ int main()
 {
 
 	Dealer b;
+	int run = checkIfInit();
+	if (run == 0)
+	{
+		b.initRun();
+	} 
 	
 	int c0;
 	do
@@ -778,6 +778,16 @@ int main()
 					c.genBill();
 					cout<<"\n\nPress any key to continue"<<endl;
 					getch();
+					// print bill to storage
+					fstream file;
+					string fn = "Bills/file" + to_string(run) + ".txt";
+					file.open(fn, ios::out);
+					streambuf* stream_buffer_cout = cout.rdbuf();
+   					streambuf* stream_buffer_cin = cin.rdbuf();
+   					streambuf* stream_buffer_file = file.rdbuf();
+   					cout.rdbuf(stream_buffer_file);
+   					c.genBill();
+   					cout.rdbuf(stream_buffer_cout);
 				}
 				
 			}while(c3 != 3);
