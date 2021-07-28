@@ -3,22 +3,24 @@ Features of our project:
 	Dealer(or Admin)
 						***Password  protected***
 		newProd() -> To add new products with product name, price and quantity.
-		dispStock() -> To display the current stock.
 		refill() -> Refill or restock current products.
-		removeItem() -> To remove a certain product by entering the product name.
-		empName() -> Has the name, employee ID number, salary and attandance of all the employees.
-		viewAttendance() -> Shows the Employee name, Employee ID and Employee Attandance of all Employees.
-		dailyAttandance() -> Marks the attandance of all the employees daily.
-		removeEmp() -> To remove an employee by typing the employee ID number.
+		initRun() -> sets default login password for first execution.
+		enterPassword() -> gets the password input from user and checks it.
+		modifyPassword() -> function to change admin login password manually.
+		addNewEmp() -> to add new Employee record
+		viewAllEmp() -> to view all records of Employees
+		
 	Employee 
 		newProd() -> To add new products with product name, price and quantity.
-		dispStock() -> To display the current stock.
 		refill() -> Refill or restock current products.
-		removeItem() -> To remove a certain product by entering the product name.
+			// supplementary functions to Dealer class
+			addEmp()
+			viewEmp()
+		
 	Customer
 		buyProd() -> Displays all the products, its quantity available and its price and 
 					 asks the user to enter the name and quantity of the product to be purchased.
-		getBill() -> Generates the bill for the products bought by the customer.
+		genBill() -> Generates the bill for the products bought by the customer.
 */
 #include<iostream>
 #include<iomanip>
@@ -52,7 +54,6 @@ class Products
 		{	
 			Quantity += qty;
 			cout << "\n\nStock updated.";
-			//getch();  Error: Return value ignored getch()
 		}
 		void show()
 		{
@@ -76,19 +77,7 @@ class Products
 			else
 				return 1;
 		}
-		/*
-		void removeItem(int qty)
-		{
-			if (Quantity >= qty)
-			{
-				Quantity -= qty;
-				cout << "\n\nStock updated.\n";
-			}
-		else
-			cout << "\n\nInsufficient stock";
-			//getch();  Error: Return value ignored getch()
-		}
-		*/
+		
 		// buyProd() supplement function
 		int sellProd(int qty)
 		{
@@ -126,7 +115,6 @@ class Employee : protected Products
 		string ename;
 		int eid;		//limit eid to 4 digits
 		double salary;
-		int attendance;
 
 	public:
 		void newProd()
@@ -793,37 +781,6 @@ int main()
 			}while(c3 != 3);
 		}
 		
-	}while(c0 != 4);
-
-	/*d.initRun();
-	
-	adm.open("admin.dat", ios::binary | ios::out);
-	adm.write((char*)&d, sizeof(d));
-	adm.close();*/
-	
-	//d.enterPassword();
-	//d.addNewEmp();
-	
-	//d.viewAllEmp();
-	//d.newProd();
-	//d.refill();
-	//dispStock();
-	/*
-	Customer c;
-	
-	char choice;
-	
-	while (tolower(choice) != 'n')
-	{
-		c.buyProd();
-		cout<<"\nDo you want to continue shopping? (Y/N): ";
-		cin>>choice;
-	}
-	
-	c.genBill();
-	*/
-	
-	
-	
+	}while(c0 != 4);	
 	return 0;
 }
